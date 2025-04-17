@@ -14,7 +14,7 @@ export default function Home() {
           </div>
         </div>
         <footer className="mt-12 text-center text-blue-200 text-sm">
-          <p>© 2023 Vagner - Defensor da Verdade sobre a Terra Plana</p>
+          <p>© 2025 Henrique - Defensor da Verdade sobre a Terra Plana</p>
         </footer>
       </div>
     </main>
