@@ -29,11 +29,21 @@ export const getGeminiModel = () => {
   return genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 };
 
-export const generateResponse = async (prompt: string) => {
+export const generateResponse = async (prompt: string, history: { role: 'user' | 'assistant', content: string }[] = []) => {
   try {
     const model = getGeminiModel();
-    // Combinando a instrução do sistema com a pergunta do usuário
-    const fullPrompt = `${SYSTEM_INSTRUCTION}\n\nPergunta do usuário: ${prompt}`;
+    
+    // Construir o histórico de conversa
+    let conversationHistory = '';
+    if (history.length > 0) {
+      conversationHistory = '\nHistórico da conversa:\n';
+      history.forEach(msg => {
+        conversationHistory += `${msg.role === 'user' ? 'Usuário' : 'Vagner'}: ${msg.content}\n`;
+      });
+    }
+
+    // Combinando a instrução do sistema com o histórico e a pergunta do usuário
+    const fullPrompt = `${SYSTEM_INSTRUCTION}${conversationHistory}\n\nPergunta do usuário: ${prompt}`;
     const result = await model.generateContent(fullPrompt);
     const response = await result.response;
     return response.text();

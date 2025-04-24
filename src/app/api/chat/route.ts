@@ -3,7 +3,7 @@ import { generateResponse } from '@/lib/gemini';
 
 export async function POST(request: Request) {
   try {
-    const { message } = await request.json();
+    const { message, history } = await request.json();
 
     if (!message) {
       return NextResponse.json(
@@ -12,7 +12,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const response = await generateResponse(message);
+    const response = await generateResponse(message, history);
 
     return NextResponse.json({ response });
   } catch (error) {

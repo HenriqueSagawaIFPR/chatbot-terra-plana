@@ -2,6 +2,9 @@
 
 import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useChatTheme } from "@/contexts/ChatThemeContext";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -13,6 +16,7 @@ export default function Chatbot() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { theme } = useChatTheme();
 
   // Função para rolar para a última mensagem
   const scrollToBottom = () => {
@@ -38,7 +42,10 @@ export default function Chatbot() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify({ 
+          message: userMessage,
+          history: messages
+        }),
       });
 
       const data = await response.json();
@@ -64,10 +71,10 @@ export default function Chatbot() {
 
   return (
     <div className="flex flex-col h-[600px]">
-      <div className="flex-1 overflow-y-auto mb-4 space-y-4 p-2">
+      <div className="flex-1 overflow-y-auto mb-4 space-y-4">
         {messages.length === 0 && (
-          <div className="text-center text-blue-100 p-4">
-            <h2 className="text-xl font-semibold mb-2">Bem-vindo ao Chat do Vagner</h2>
+          <div className="text-center">
+            <h2 className="text-xl font-semibold dark:text-white text-black">Bem-vindo ao Chat do Vagner</h2>
             <p>Pergunte sobre a verdadeira forma da Terra e as mentiras da NASA.</p>
           </div>
         )}
@@ -82,8 +89,8 @@ export default function Chatbot() {
             <div
               className={`max-w-[80%] rounded-lg p-3 ${
                 message.role === 'user'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-blue-900/50 text-blue-100 border border-blue-400/30'
+                  ? `${theme.primaryColor} text-white`
+                  : `${theme.messageBgColor} text-gray-900 dark:text-gray-100`
               }`}
             >
               {message.role === 'user' ? (
@@ -114,22 +121,24 @@ export default function Chatbot() {
         <div ref={messagesEndRef} />
       </div>
       
-      <form onSubmit={handleSubmit} className="flex gap-2 mt-auto">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Pergunte sobre a Terra Plana..."
-          className="flex-1 p-3 bg-blue-800/50 border border-blue-400/30 rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
-        >
-          Enviar
-        </button>
-      </form>
+      <div className="border-t p-4">
+        <div className="flex gap-2">
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={(e) => e.key === "Enter" && handleSubmit(e)}
+            placeholder="Pergunte sobre a Terra Plana..."
+            className={`flex-1 ${theme.inputBgColor}`}
+          />
+          <Button
+            onClick={(e) => handleSubmit(e)}
+            disabled={isLoading}
+            className={theme.buttonColor}
+          >
+            Enviar
+          </Button>
+        </div>
+      </div>
     </div>
   );
 } 
